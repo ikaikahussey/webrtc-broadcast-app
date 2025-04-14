@@ -8,17 +8,22 @@ WORKDIR /app
 COPY client/package*.json ./client/
 COPY server/package*.json ./server/
 
-# Install dependencies
-RUN cd client && npm install && cd ../server && npm install
+# Install dependencies separately
+WORKDIR /app/client
+RUN npm install
 
-# Copy rest of the app
+WORKDIR /app/server
+RUN npm install
+
+# Copy the full app
+WORKDIR /app
 COPY . .
 
 # Build frontend
-RUN cd client && npm run build
+WORKDIR /app/client
+RUN npm run build
 
-# Expose port
+# Serve from backend
+WORKDIR /app
 EXPOSE 3000
-
-# Start server
 CMD ["node", "server/server.js"]
