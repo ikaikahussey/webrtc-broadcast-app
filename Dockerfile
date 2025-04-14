@@ -1,29 +1,22 @@
-# Base image
 FROM node:18
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY client/package*.json ./client/
-COPY server/package*.json ./server/
-
-# Install dependencies separately
-WORKDIR /app/client
-RUN npm install
-
-WORKDIR /app/server
-RUN npm install
-
-# Copy the full app
-WORKDIR /app
+# Copy all files (must include client and server folders)
 COPY . .
 
-# Build frontend
-WORKDIR /app/client
-RUN npm run build
+# Install dependencies
+RUN npm install --prefix client
+RUN npm install --prefix server
 
-# Serve from backend
+# Build the React frontend
+RUN npm run build --prefix client
+
+# Set the working directory for server
 WORKDIR /app
+
+# Expose the port
 EXPOSE 3000
+
+# Start the backend server
 CMD ["node", "server/server.js"]
